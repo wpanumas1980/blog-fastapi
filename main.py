@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal
 import models
-from schemas import Blogs
+from schemas import Blogs, UpdateBlog
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -18,9 +18,7 @@ def get_db():
 
 @app.post('/blogs', status_code=status.HTTP_201_CREATED)
 def create(request: Blogs, db: Session = Depends(get_db)):
-    print('request =>', request)
     new_blog = models.Blogs(title=request.title,description=request.description)
-    print('new_blog =>', new_blog)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
@@ -37,7 +35,6 @@ def findOne(id,response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blogs).filter(models.Blogs.id == id).first()
     if not blog:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'Blog {id} is not found!')
-
     return blog
 
 @app.delete('/blogs/{id}',status_code=status.HTTP_204_NO_CONTENT)
@@ -50,12 +47,13 @@ def destroy(id,db: Session = Depends(get_db)):
           return 'done'
 
 @app.put('/blogs/{id}',status_code=status.HTTP_202_ACCEPTED)
-def update(id,request: Blogs, db: Session = Depends(get_db)):
+def update(id,request: UpdateBlog, db: Session = Depends(get_db)):
     blog = db.query(models.Blogs).filter(models.Blogs.id == id)
     if not blog.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'Blog {id} is not found!')
     
-    update_item_encoded = jsonable_encoder(request.dict(exclude_none=True))
+    # update_item_encoded = jsonable_encoder(request.dict(exclude_none=True))
+    update_item_encoded = jsonable_encoder(request.dict(exclude_unset=True))
     blog.update(update_item_encoded)
     db.commit()
     return 'updated'
