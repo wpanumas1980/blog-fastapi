@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional,Union
 
 class Blogs(BaseModel):
-    title:str
-    description:str
+    title:Union[str, None] = None
+    description:Optional[str]
