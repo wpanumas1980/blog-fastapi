@@ -1,10 +1,11 @@
 
+from typing import List
 from fastapi import FastAPI,Depends,status,Request,Response,HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal
 import models
-from schemas import Blogs, UpdateBlog
+from schemas import Blogs, UpdateBlog, ShowBlog
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -25,12 +26,12 @@ def create(request: Blogs, db: Session = Depends(get_db)):
 
     return new_blog
 
-@app.get('/blogs')
+@app.get('/blogs',response_model=List[ShowBlog])
 def find( db: Session = Depends(get_db)):
     blogs = db.query(models.Blogs).all()
     return blogs
 
-@app.get('/blogs/{id}', status_code=200)
+@app.get('/blogs/{id}', status_code=200,response_model=ShowBlog)
 def findOne(id,response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blogs).filter(models.Blogs.id == id).first()
     if not blog:
