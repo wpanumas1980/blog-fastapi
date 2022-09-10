@@ -1,11 +1,11 @@
-
 from typing import List
-from fastapi import FastAPI,Depends,status,Request,Response,HTTPException
+from fastapi import FastAPI,Depends,status,Response,HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal
 import models
-from schemas import Blogs, UpdateBlog, ShowBlog
+from schemas import Blogs, UpdateBlog, ShowBlog, Users
+from hashing import Hash
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -59,5 +59,18 @@ def update(id,request: UpdateBlog, db: Session = Depends(get_db)):
     db.commit()
     return 'updated'
 
+@app.get('/users')
+def find( db: Session = Depends(get_db)):
+    users = db.query(models.Users).all()
+    return users
 
-#   print('update_item_encoded =>', update_item_encoded)
+# pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+@app.post('/users')
+def create(request:Users, db: Session = Depends(get_db)):
+    # hashedPassword = pwd_ctx.hash(request.password)
+    new_user = models.Users(fname=request.fname,email=request.email,password=Hash.bcrypt(request.password))
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user

@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Optional,Union
+from pydantic import BaseModel
+from typing import Optional
 
 class Blogs(BaseModel):
     # title:Union[str, None] = None
@@ -16,4 +16,7 @@ class ShowBlog(BaseModel):
     class Config():
         orm_mode = True
 
-
+class Users(BaseModel):
+    fname:str
+    email:str
+    password:str
