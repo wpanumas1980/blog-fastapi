@@ -1,9 +1,7 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from schemas import Blogs, UpdateBlog, ShowBlogs
-from database import get_db
+from schemas import Blogs
 import models
 
 def create(request: Blogs, db: Session):

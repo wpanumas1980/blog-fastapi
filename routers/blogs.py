@@ -1,10 +1,8 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from schemas import Blogs, UpdateBlog, ShowBlogs
 from database import get_db
-import models
 
 from repository import blogs
 
