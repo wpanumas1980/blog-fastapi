@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from schemas import Users
 from hashing import Hash
